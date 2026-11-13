@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="按城市找小八。查看吉伊卡哇官方旗舰店、主题展和快闪的地址、楼层、活动日期及预约信息。">
+  <meta name="theme-color" content="#eaf3fd">
+  <title>去哪儿找小八｜中国内地打卡地图</title>
+  <style>
+    * { box-sizing:border-box; }
+    :root { color-scheme:light; --ink:#19344c; --sub:#465e74; --blue:#20568f; --line:#d4e1ee; --paper:#fff; }
+    body { margin:0; background:#f5f9fd; color:var(--ink); font:16px/1.55 "Inter","Microsoft YaHei","PingFang SC",system-ui,sans-serif; }
+    .wrap { width:min(1100px,100% - 36px); margin-inline:auto; }
+    header { background:#eaf3fd; border-bottom:1px solid var(--line); padding:36px 0 28px; }
+    h1,h2,p { margin:0; }
+    h1 { font-size:clamp(32px,6vw,55px); line-height:1.13; letter-spacing:-.045em; }
+    h2 { font-size:clamp(20px,3vw,26px); line-height:1.3; }
+    header p { margin-top:9px; color:var(--sub); }
+    main { padding:24px 0 36px; }
+    button,select { font:inherit; color:inherit; }
+    button { cursor:pointer; }
+    button,select,.route { min-height:44px; }
+    .filters,.actions { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+    .filters button,.route,select { border:1px solid var(--line); border-radius:10px; background:var(--paper); padding:8px 13px; }
+    #overview { display:inline-flex; align-items:center; min-height:44px; padding-inline:6px; }
+    .filters button[aria-pressed=true],.route { background:var(--blue); color:#fff; border-color:var(--blue); }
+    select { max-width:100%; }
+    .layout { display:grid; grid-template-columns:minmax(260px,.86fr) minmax(0,1.55fr); gap:20px; align-items:start; margin-top:18px; }
+    .venues,.selected { background:var(--paper); border:1px solid var(--line); border-radius:16px; }
+    .venues { padding:8px 14px; }
+    .venues ul { list-style:none; margin:0; padding:0; }
+    .venues li + li { border-top:1px solid var(--line); }
+    .venues button { display:grid; gap:2px; width:100%; text-align:left; border:0; border-radius:8px; background:none; padding:10px; margin-block:3px; }
+    .venues button[aria-pressed=true] { background:#eaf3fd; }
+    .venues button span { color:var(--sub); font-size:13px; }
+    .count,.meta,footer { color:var(--sub); font-size:14px; }
+    .count { padding:8px 10px 4px; }
+    .selected { overflow:hidden; }
+    .details { display:grid; gap:8px; padding:18px; }
+    .actions { margin-top:4px; }
+    a { color:var(--blue); }
+    .route { display:inline-flex; align-items:center; text-decoration:none; }
+    footer { margin-top:18px; }
+    [hidden] { display:none !important; }
+    :focus-visible { outline:2px solid #2372bd; outline-offset:3px; }
+    @media(max-width:700px) {
+      header { padding:24px 0 20px; }
+      main { padding-top:14px; }
+      .layout { grid-template-columns:1fr; gap:12px; margin-top:12px; }
+      .venues ul { max-height:154px; overflow:auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>去哪儿找小八</h1>
+      <p>中国内地打卡地图 · 点位核对于 2026 年 11 月 13 日</p>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="filters" role="group" aria-label="筛选点位">
+      <button type="button" data-kind="open" aria-pressed="true">现在可去</button>
+      <button type="button" data-kind="soon" aria-pressed="false">即将开始</button>
+      <button type="button" data-kind="ended" aria-pressed="false">已结束</button>
+      <select aria-label="筛选城市" id="city"></select>
+      <a id="overview" target="_blank" rel="noopener noreferrer" hidden>在高德看场馆分布</a>
+    </div>
+    <div class="layout">
+      <section class="venues" aria-label="打卡点列表">
+        <p class="count" id="count" aria-live="polite"></p>
+        <ul id="venue-list"></ul>
+      </section>
+      <article class="selected" id="selected" aria-labelledby="place-title">
+        <div class="details">
+          <div aria-live="polite">
+            <p class="meta" id="place-meta"></p>
+            <h2 id="place-title"></h2>
+          </div>
+          <p id="place-address"></p>
+          <p id="place-feature"></p>
+          <p class="meta" id="place-entry"></p>
+          <div class="actions" id="links"></div>
+        </div>
+      </article>
+    </div>
+    <footer>收录有公开出处的官方旗舰店、主题餐饮和限时活动。布景、预约和库存以会场公告为准。</footer>
+    <noscript>打开浏览器的 JavaScript 后即可查找打卡点。</noscript>
+  </main>
+  <script>
+    const announcement = 'https://www.sina.cn/media/7963282024';
+    const alifish = 'https://ip.alibaba.com/';
+    const clinicVenues = 'https://chiikawa-info.jp/p26/chiikawaclinic/img/tenpo_list_02_2.jpg?a2=';
+    const summerPopups = 'https://www.sina.cn/news/detail/5320158207542075.html';
+    const places = [
+      { id:'wuhan-baby', city:'武汉', kind:'open', short:'Baby 展', title:'吉伊卡哇 Baby 展和快闪',
+        status:'在展 · 2026.09.24—11.15', address:'武汉恒隆广场 · 快闪店在东区 L1',
+        feature:'拍照｜找三只宝宝围坐的茶话会，小八也在桌边。', entry:'快闪店按官宣无需预约。',
+        map:'武汉恒隆广场', sources:[['品牌公告','https://www.sina.cn/news/detail/5344196517954249.html'],['场景介绍','https://sw.wuhan.gov.cn/xwdt/gzdt/202609/t20260924_2853905.shtml']] },
+      { id:'beijing-roof', city:'北京', kind:'open', short:'京韵脊兽', title:'吉伊卡哇快闪 · 京韵脊兽',
+        status:'在展 · 2026.09.25—11.23', address:'北京朝阳合生汇 1 层中庭',
+        feature:'找小八｜北京限定「京韵脊兽」里，小八变成了屋脊上的狮子。', entry:'9 月 27 日起按官宣无需预约。限定周边以现场库存为准。',
+        map:'北京朝阳合生汇', sources:[['品牌公告','https://www.sina.cn/news/detail/5343064169907523.html'],['现场与造型','https://news.bjd.com.cn/2026/09/25/11973787.shtml']] },
+      { id:'shanghai-store', city:'上海', kind:'open', short:'旗舰店', title:'吉伊卡哇上海旗舰店',
+        status:'常设 · 官方旗舰店', address:'黄浦区南京东路 139 号 · 外滩中央广场',
+        feature:'拍照｜门店公开实拍有三小只主题布景，可以先去一楼的经典主题区看看。', entry:'官方公布 10:00–22:00，常规进店无需预约。',
+        map:'上海外滩中央广场 南京东路139号', sources:[['品牌地址及实拍','https://www.sina.cn/news/detail/5215887668021399.html']] },
+      { id:'shanghai-ramen', city:'上海', kind:'open', short:'拉面店', title:'吉伊卡哇拉面店「豚」',
+        status:'主题餐饮 · 2026.09.29 起试营业', address:'黄浦区南京东路 299 号 · 宏伊广场 5 楼',
+        feature:'吃面｜可以看漫画拉面店的主题布景和角色餐具。', entry:'试营业公告的预约入口为「色拉酱的时光门」，可先查当天场次。',
+        map:'上海宏伊国际广场', sources:[['品牌预约公告','https://www.sina.cn/news/detail/5349873916055504.html'],['楼层与到店体验','https://post.smzdm.com/p/ak8lxn0r/']] },
+      { id:'nanjing-store', city:'南京', kind:'open', short:'旗舰店', title:'吉伊卡哇南京旗舰店',
+        status:'常设 · 官方旗舰店', address:'秦淮区中山南路 1 号 · 新百中心西南门',
+        feature:'拍照｜一楼有南京限定「嘭嘭鸭」，二楼有魔法少女、天使与恶魔、Baby 主题区。', entry:'开业预约期已结束，临时限流以现场为准。',
+        map:'南京新百中心', sources:[['门店及主题区','https://jsnews.jschina.com.cn/jbxq/202607/t20260724_s6a6370dbe4b0104d8224f537.shtml'],['授权方活动页',alifish]] },
+      { id:'hangzhou-store', city:'杭州', kind:'open', short:'旗舰店', title:'吉伊卡哇杭州旗舰店',
+        status:'常设 · 官方旗舰店', address:'上城区湖滨步行街 · 东坡路 2 号',
+        feature:'拍照｜开店资料里，吉伊和小八在门口迎宾，店里还有西湖游船布景。', entry:'官方到店攻略公布 10:00–22:00。',
+        map:'杭州东坡路2号 吉伊卡哇旗舰店', sources:[['品牌到店攻略','https://www.sina.cn/news/detail/5280657833725342.html'],['门店布景','https://zj.sina.cn/comprehensive/2026-04-26/detail-inhvvean8682682.d.html']] },
+      { id:'guangzhou-store', city:'广州', kind:'open', short:'旗舰店', title:'吉伊卡哇广州旗舰店',
+        status:'常设 · 官方旗舰店', address:'天河区天河路 208 号 · 天河城购物中心 1 层',
+        feature:'拍照｜店内有武术主题布景，广东限定造型里能找到穿功夫服的小八。', entry:'官方公布 10:00–22:00，常规进店无需预约。',
+        map:'广州天河城购物中心', sources:[['品牌地址及实拍','https://www.sina.cn/news/detail/5346763633591083.html'],['广深武术主题','https://news.bjd.com.cn/2026/09/25/11973778.shtml']] },
+      { id:'shenzhen-store', city:'深圳', kind:'open', short:'旗舰店', title:'吉伊卡哇深圳旗舰店',
+        status:'常设 · 官方旗舰店', address:'南山区文心五路 33 号 · 海岸城 2 层 290–291',
+        feature:'逛店｜找「灵春拳影」里练功的小八。商场装置可向海岸城确认。', entry:'官方公布 10:00–22:00，常规进店无需预约。',
+        map:'深圳南山海岸城购物中心', sources:[['品牌门店公告',announcement],['广深武术主题','https://news.bjd.com.cn/2026/09/25/11973778.shtml']] },
+      { id:'sanya-store', city:'三亚', kind:'open', short:'旗舰店', title:'吉伊卡哇三亚旗舰店',
+        status:'常设 · 官方旗舰店', address:'海棠区海棠北路 118 号 · cdf 三亚国际免税城一期 B 区 3 层',
+        feature:'逛店｜三亚限定区有木屋棚架和贝壳布景，小八有「海岸拾趣」泳装造型。', entry:'品牌开业公告为无需预约，周边以门店库存为准。',
+        map:'cdf三亚国际免税城一期', sources:[['授权方门店地址',alifish],['门店布景','https://www.sohu.com/a/1078600161_387266']] },
+      { id:'shanghai-clinic', city:'上海', kind:'soon', short:'诊所快闪', title:'吉伊卡哇诊所快闪 · 上海站',
+        status:'即将开始 · 2026.11.27—2027.01.07', address:'黄浦区南京东路 340–372 号 · 百联 ZX 创趣场 L1（B72-01F01-TG-0001）',
+        feature:'找小八｜官方系列有护士帽小八。现场布景以会场开幕公告为准。', entry:'官宣时段 10:00–22:00，入场安排关注会场后续公告。',
+        map:'上海百联ZX创趣场', sources:[['官方上海站','https://chiikawa-info.jp/p26/chiikawaclinic/shanghai.html'],['官方会场图',clinicVenues]] },
+      { id:'shenzhen-clinic', city:'深圳', kind:'soon', short:'诊所快闪', title:'吉伊卡哇诊所快闪 · 深圳站',
+        status:'即将开始 · 2026.12.24—2027.01.25', address:'福田区福华三路 268–269 号 · 星河 COCO Park L1（TG L1 02）',
+        feature:'找小八｜官方系列有护士帽小八。现场布景以会场开幕公告为准。', entry:'官宣时段 10:00–22:00，入场安排关注会场后续公告。',
+        map:'深圳福田星河COCO Park', sources:[['官方深圳站','https://chiikawa-info.jp/p26/chiikawaclinic/shenzhen.html'],['官方会场图',clinicVenues]] },
+      { id:'shanghai-days', city:'上海', kind:'ended', short:'上海特展', title:'CHIIKAWA DAYS 上海特展',
+        status:'已结束 · 2026.09.12—11.01', address:'静安嘉里中心 · 南京西路 1515 号',
+        feature:'回看｜街角曾摆出约 9 米高的三小只充气雕塑。', entry:'展期已过。',
+        sources:[['静安区活动记录','https://www.jingan.gov.cn/rmtzx/003001/20260915/b7181a9b-b172-4713-b4ee-36a96fdc2777.html']] },
+      { id:'qingdao-pop', city:'青岛', kind:'ended', short:'万象城快闪', title:'吉伊卡哇青岛快闪',
+        status:'已结束 · 2026.09.04—10.30', address:'青岛万象城 B2 中庭',
+        feature:'回看｜青岛站有招福小八系列周边。', entry:'展期已过。',
+        sources:[['青岛市文旅局公告','https://www.sina.cn/news/detail/5336994630079412.html']] },
+      { id:'shenyang-pop', city:'沈阳', kind:'ended', short:'万象城快闪', title:'吉伊卡哇沈阳快闪',
+        status:'已结束 · 2026 年 10 月 18 日收官', address:'沈阳万象城三期广场 · 西 2 门对面',
+        feature:'回看｜品牌在三期广场办过三小只主题快闪。', entry:'展期已过。',
+        sources:[['品牌会场公告',summerPopups]] },
+      { id:'xiamen-pop', city:'厦门', kind:'ended', short:'SM 快闪', title:'吉伊卡哇厦门快闪',
+        status:'已结束 · 2026.07.25—08.31', address:'厦门 SM 新生活广场二期中庭',
+        feature:'回看｜厦门站和沈阳站是同一轮官宣的夏季快闪。', entry:'展期已过。',
+        sources:[['品牌会场公告',summerPopups]] }
+    ];
+
+    const activityDates = {
+      'wuhan-baby':['2026-09-24','2026-11-15'], 'beijing-roof':['2026-09-25','2026-11-23'],
+      'shanghai-clinic':['2026-11-27','2027-01-07'], 'shenzhen-clinic':['2026-12-24','2027-01-25'],
+      'shanghai-days':['2026-09-12','2026-11-01'], 'qingdao-pop':['2026-09-04','2026-10-30'],
+      'shenyang-pop':['2026-08-01','2026-10-18'], 'xiamen-pop':['2026-07-25','2026-08-31']
+    };
+    // 高德场馆或相邻商场的坐标，作为搜索地图的初始中心。
+    const mapCenters = {
+      'wuhan-baby':[114.273815,30.577843], 'beijing-roof':[116.480110,39.894007],
+      'shanghai-store':[121.487173,31.237999], 'shanghai-ramen':[121.484529,31.236942],
+      'nanjing-store':[118.785067,32.040797], 'hangzhou-store':[120.162484,30.253160],
+      'guangzhou-store':[113.322642,23.132291], 'shenzhen-store':[113.935647,22.516961],
+      'sanya-store':[109.749566,18.376071], 'shanghai-clinic':[121.483254,31.237161],
+      'shenzhen-clinic':[114.054083,22.532539]
+    };
+    const today = new Intl.DateTimeFormat('sv-SE', {timeZone:'Asia/Shanghai'}).format(new Date());
+    const byId = id => document.getElementById(id);
+    const categoryButtons = [...document.querySelectorAll('[data-kind]')];
+    const citySelect = byId('city');
+    const venueList = byId('venue-list');
+    const statuses = {open:'在展',soon:'即将开始',ended:'已结束'};
+
+    function activityStatus(place) {
+      const dates = activityDates[place.id];
+      if (!dates) return 'open';
+      if (today < dates[0]) return 'soon';
+      return today > dates[1] ? 'ended' : 'open';
+    }
+
+    const byCategory = Object.fromEntries(Object.keys(statuses).map(kind =>
+      [kind, places.filter(place => activityStatus(place) === kind)]));
+    const hashId = new URLSearchParams(location.hash.slice(1)).get('place');
+    const linkedPlace = places.find(place => place.id === hashId);
+    let category = linkedPlace ? activityStatus(linkedPlace) : 'open';
+
+    function link(label, url, className) {
+      const anchor = document.createElement('a');
+      anchor.textContent = label;
+      anchor.href = url;
+      anchor.target = '_blank';
+      anchor.rel = 'noopener noreferrer';
+      if (className) anchor.className = className;
+      return anchor;
+    }
+
+    function showPlace(place) {
+      byId('selected').hidden = !place;
+      if (!place) return;
+      for (const button of venueList.querySelectorAll('button')) {
+        button.setAttribute('aria-pressed', button.dataset.place === place.id);
+      }
+      const dates = activityDates[place.id];
+      const status = dates ? statuses[category] + ' · ' + dates.join(' 至 ') : place.status;
+      byId('place-meta').textContent = place.city + ' · ' + status;
+      byId('place-title').textContent = place.title;
+      byId('place-address').textContent = place.address;
+      byId('place-feature').textContent = place.feature;
+      byId('place-entry').textContent = category === 'ended' ? '展期已过。' : place.entry;
+      const links = place.sources.map(([label,url]) => link(label,url));
+      if (category !== 'ended' && place.map) {
+        const search = new URL('https://uri.amap.com/search');
+        search.search = new URLSearchParams({keyword:place.map,city:place.city,view:'map',src:'xiaoba-map'});
+        links.unshift(link('在高德打开',search,'route'));
+      }
+      byId('links').replaceChildren(...links);
+    }
+
+    function renderList(preferredPlace) {
+      const visible = byCategory[category].filter(place => !citySelect.value || place.city === citySelect.value);
+      byId('count').textContent = visible.length ? visible.length + ' 个点位' : '这个时段暂无点位';
+      const overview = byId('overview');
+      const mapped = visible.filter(place => mapCenters[place.id]);
+      overview.hidden = category === 'ended' || mapped.length < 2 || mapped.length > 10;
+      if (!overview.hidden) {
+        const distribution = new URL('https://uri.amap.com/marker');
+        const markers = mapped.map(place => [...mapCenters[place.id], place.city + place.short + '附近'].join(','));
+        distribution.search = new URLSearchParams({markers:markers.join('|'),src:'xiaoba-map'});
+        overview.href = distribution.href;
+      }
+      const rows = visible.map(place => {
+        const row = document.createElement('li');
+        const button = document.createElement('button');
+        const name = document.createElement('strong');
+        const meta = document.createElement('span');
+        button.type = 'button';
+        button.dataset.place = place.id;
+        name.textContent = place.title;
+        meta.textContent = place.city + ' · ' + place.address;
+        button.append(name,meta);
+        button.addEventListener('click',() => {
+          showPlace(place);
+          history.replaceState(null,'','#place=' + place.id);
+          if (matchMedia('(max-width: 700px)').matches) byId('selected').scrollIntoView({block:'nearest'});
+        });
+        row.append(button);
+        return row;
+      });
+      venueList.replaceChildren(...rows);
+      showPlace(visible.find(place => place.id === preferredPlace) ?? visible[0]);
+    }
+
+    function renderCategory(preferredPlace) {
+      for (const button of categoryButtons) button.setAttribute('aria-pressed', button.dataset.kind === category);
+      const cityNames = [...new Set(byCategory[category].map(place => place.city))];
+      citySelect.replaceChildren(new Option('全部城市',''),...cityNames.map(city => new Option(city,city)));
+      renderList(preferredPlace);
+    }
+
+    for (const button of categoryButtons) button.addEventListener('click',() => {
+      if (category === button.dataset.kind) return;
+      category = button.dataset.kind;
+      history.replaceState(null,'',location.pathname + location.search);
+      renderCategory();
+    });
+    citySelect.addEventListener('change',() => {
+      history.replaceState(null,'',location.pathname + location.search);
+      renderList();
+    });
+    renderCategory(linkedPlace?.id);
+  </script>
+</body>
+</html>
