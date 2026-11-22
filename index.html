@@ -32,7 +32,7 @@
     .venues li + li { border-top:1px solid var(--line); }
     .venues button { display:grid; gap:2px; width:100%; text-align:left; border:0; border-radius:8px; background:none; padding:10px; margin-block:3px; }
     .venues button[aria-pressed=true] { background:#eaf3fd; }
-    .venues button span { color:var(--sub); font-size:13px; }
+    .venues button span { color:var(--sub); font-size:14px; }
     .count,.meta,footer { color:var(--sub); font-size:14px; }
     .count { padding:8px 10px 4px; }
     .selected { overflow:hidden; }
@@ -58,7 +58,7 @@
   <header>
     <div class="wrap">
       <h1>去哪儿找小八</h1>
-      <p>中国内地打卡地图 · 点位核对 2026.11.13 · 上海诊所入场更新 2026.11.22</p>
+      <p>中国内地打卡地图 · 基础点位核对 2026.11.13 · 活动及出处更新 2026.11.22</p>
     </div>
   </header>
   <main class="wrap">
@@ -94,7 +94,6 @@
     <noscript>打开浏览器的 JavaScript 后即可查找打卡点。</noscript>
   </main>
   <script>
-    const announcement = 'https://www.sina.cn/media/7963282024';
     const alifish = 'https://ip.alibaba.com/';
     const clinicVenues = 'https://chiikawa-info.jp/p26/chiikawaclinic/img/tenpo_list_02_2.jpg?a2=';
     const summerPopups = 'https://www.sina.cn/news/detail/5320158207542075.html';
@@ -124,20 +123,20 @@
         feature:'拍照｜开店资料里，吉伊和小八在门口迎宾，店里还有西湖游船布景。', entry:'官方到店攻略公布 10:00–22:00。',
         map:'杭州东坡路2号 吉伊卡哇旗舰店', sources:[['品牌到店攻略','https://www.sina.cn/news/detail/5280657833725342.html'],['门店布景','https://zj.sina.cn/comprehensive/2026-04-26/detail-inhvvean8682682.d.html']] },
       { id:'guangzhou-store', city:'广州', kind:'open', short:'旗舰店', title:'吉伊卡哇广州旗舰店',
-        status:'常设 · 官方旗舰店', address:'天河区天河路 208 号 · 天河城购物中心 1 层',
+        status:'常设 · 官方旗舰店', address:'天河区天河路 208 号 · 天河城购物中心 1 层 108 铺位',
         feature:'拍照｜店内有武术主题布景，广东限定造型里能找到穿功夫服的小八。', entry:'官方公布 10:00–22:00，常规进店无需预约。',
-        map:'广州天河城购物中心', sources:[['品牌地址及实拍','https://www.sina.cn/news/detail/5346763633591083.html'],['广深武术主题','https://news.bjd.com.cn/2026/09/25/11973778.shtml']] },
+        map:'广州天河城购物中心', sources:[['授权方门店地址','https://www.sina.cn/news/detail/5342384566569244.html'],['品牌地址及实拍','https://www.sina.cn/news/detail/5346763633591083.html'],['广深武术主题','https://news.bjd.com.cn/2026/09/25/11973778.shtml']] },
       { id:'shenzhen-store', city:'深圳', kind:'open', short:'旗舰店', title:'吉伊卡哇深圳旗舰店',
         status:'常设 · 官方旗舰店', address:'南山区文心五路 33 号 · 海岸城 2 层 290–291',
         feature:'逛店｜找「灵春拳影」里练功的小八。商场装置可向海岸城确认。', entry:'官方公布 10:00–22:00，常规进店无需预约。',
-        map:'深圳南山海岸城购物中心', sources:[['品牌门店公告',announcement],['广深武术主题','https://news.bjd.com.cn/2026/09/25/11973778.shtml']] },
+        map:'深圳南山海岸城购物中心', sources:[['授权方门店地址','https://www.sina.cn/news/detail/5342384566569244.html'],['广深武术主题','https://news.bjd.com.cn/2026/09/25/11973778.shtml']] },
       { id:'sanya-store', city:'三亚', kind:'open', short:'旗舰店', title:'吉伊卡哇三亚旗舰店',
         status:'常设 · 官方旗舰店', address:'海棠区海棠北路 118 号 · cdf 三亚国际免税城一期 B 区 3 层',
-        feature:'逛店｜三亚限定区有木屋棚架和贝壳布景，小八有「海岸拾趣」泳装造型。', entry:'品牌开业公告为无需预约，周边以门店库存为准。',
-        map:'cdf三亚国际免税城一期', sources:[['授权方门店地址',alifish],['门店布景','https://www.sohu.com/a/1078600161_387266']] },
+        feature:'逛店｜三亚限定区有木屋棚架和贝壳布景，小八有「海岸拾趣」泳装造型。', entry:'品牌公布 10:00–22:00，常规进店无需预约，周边以门店库存为准。',
+        map:'cdf三亚国际免税城一期', sources:[['品牌门店地址及营业时间','https://www.sina.cn/news/detail/5345193316058501.html'],['品牌进店公告','https://www.sina.cn/news/detail/5343471889285330.html'],['门店布景','https://www.sohu.com/a/1078600161_387266']] },
       { id:'shanghai-clinic', city:'上海', kind:'soon', short:'诊所快闪', title:'吉伊卡哇诊所快闪 · 上海站',
         status:'即将开始 · 2026.11.27—2027.01.07', address:'黄浦区南京东路 340 号 · 百联 ZX 创趣场 L1 中庭',
-        feature:'找小八｜护士帽夹在蓝耳朵中间，手里托着一颗心形。官方已公布毛绒挂件图，现场布景待开幕核对。', entry:'11 月 27—28 日需预约，11 月 29 日至 2027 年 1 月 7 日无需预约。11 月 22 日 10:00 起在微信「阿里鱼IP俱乐部」预约。预约成功后，携预约码和本人有效身份证件，提前 10 分钟到指定排队区。',
+        feature:'找小八｜护士帽夹在蓝耳朵中间，手里托着一颗心形。官方已公布毛绒挂件图，现场布景待开幕核对。', entry:'官宣时段 10:00–22:00。11 月 27—28 日需预约，11 月 29 日至 2027 年 1 月 7 日无需预约。11 月 22 日 10:00 起在微信「阿里鱼IP俱乐部」预约。预约成功后，携预约码和本人有效身份证件，提前 10 分钟到指定排队区。',
         map:'上海百联ZX创趣场', sources:[['商场预约公告（11 月 20 日）','https://www.sina.cn/news/detail/5367268604117609.html'],['官方上海站','https://chiikawa-info.jp/p26/chiikawaclinic/shanghai.html'],['官方会场图',clinicVenues]] },
       { id:'shenzhen-clinic', city:'深圳', kind:'soon', short:'诊所快闪', title:'吉伊卡哇诊所快闪 · 深圳站',
         status:'即将开始 · 2026.12.24—2027.01.25', address:'福田区福华三路 268–269 号 · 星河 COCO Park L1（TG L1 02）',
