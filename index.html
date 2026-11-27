@@ -37,6 +37,7 @@
     .count { padding:8px 10px 4px; }
     .selected { overflow:hidden; }
     .details { display:grid; gap:8px; padding:18px; }
+    .admission { padding:10px 12px; border-left:3px solid var(--blue); background:#eaf3fd; border-radius:4px; }
     .actions { margin-top:4px; }
     .share { min-height:44px; }
     #share-feedback { min-height:22px; }
@@ -58,7 +59,7 @@
   <header>
     <div class="wrap">
       <h1>去哪儿找小八</h1>
-      <p>中国内地打卡地图 · 基础点位核对 2026.11.13 · 活动及出处更新 2026.11.22</p>
+      <p>中国内地打卡地图 · 基础点位核对 2026.11.13 · 上海诊所规则复核 2026.11.27</p>
     </div>
   </header>
   <main class="wrap">
@@ -82,6 +83,7 @@
           </div>
           <p id="place-address"></p>
           <p id="place-feature"></p>
+          <p class="admission" id="place-admission" hidden></p>
           <p class="meta" id="place-entry"></p>
           <div class="actions" id="links"></div>
           <button class="share" type="button" id="share-place">复制这个点位的链接</button>
@@ -91,7 +93,7 @@
       </article>
     </div>
     <footer>
-      <p><a href="https://github.com/gulzxeric/xiaoba-map#readme" target="_blank" rel="noopener noreferrer">备用地点清单</a> · <a href="https://github.com/gulzxeric/xiaoba-map/releases/download/offline-2026-11-22/xiaoba-map-offline.html">下载离线地点册</a></p>
+      <p><a href="https://github.com/gulzxeric/xiaoba-map#readme" target="_blank" rel="noopener noreferrer">备用地点清单</a> · <a href="https://github.com/gulzxeric/xiaoba-map/releases/download/offline-2026-11-27/xiaoba-map-offline.html">下载离线地点册</a></p>
       <p>收录有公开出处的官方旗舰店、主题餐饮和限时活动。布景、预约和库存以会场公告为准。</p>
     </footer>
     <noscript>打开浏览器的 JavaScript 后即可查找打卡点。</noscript>
@@ -101,13 +103,13 @@
     const clinicVenues = 'https://chiikawa-info.jp/p26/chiikawaclinic/img/tenpo_list_02_2.jpg?a2=';
     const summerPopups = 'https://www.sina.cn/news/detail/5320158207542075.html';
     const places = [
-      { id:'wuhan-baby', city:'武汉', kind:'open', short:'Baby 展', title:'吉伊卡哇 Baby 展和快闪',
-        status:'在展 · 2026.09.24—11.15', address:'武汉恒隆广场 · 快闪店在东区 L1',
-        feature:'拍照｜找三只宝宝围坐的茶话会，小八也在桌边。', entry:'快闪店按官宣无需预约。',
+      { id:'wuhan-baby', city:'武汉', kind:'ended', short:'Baby 展', title:'吉伊卡哇 Baby 展和快闪',
+        status:'已结束 · 2026.09.24—11.15', address:'武汉恒隆广场 · 原快闪店在东区 L1',
+        feature:'回看｜展览中的三只宝宝曾围坐茶话会，小八也在桌边。', entry:'原展期为 9 月 24 日至 11 月 15 日，已结束。',
         map:'武汉恒隆广场', sources:[['品牌公告','https://www.sina.cn/news/detail/5344196517954249.html'],['场景介绍','https://sw.wuhan.gov.cn/xwdt/gzdt/202609/t20260924_2853905.shtml']] },
-      { id:'beijing-roof', city:'北京', kind:'open', short:'京韵脊兽', title:'吉伊卡哇快闪 · 京韵脊兽',
-        status:'在展 · 2026.09.25—11.23', address:'北京朝阳合生汇 1 层中庭',
-        feature:'找小八｜北京限定「京韵脊兽」里，小八变成了屋脊上的狮子。', entry:'9 月 27 日起按官宣无需预约。限定周边以现场库存为准。',
+      { id:'beijing-roof', city:'北京', kind:'ended', short:'京韵脊兽', title:'吉伊卡哇快闪 · 京韵脊兽',
+        status:'已结束 · 2026.09.25—11.23', address:'北京朝阳合生汇 1 层中庭',
+        feature:'回看｜北京限定「京韵脊兽」里，小八是屋脊上的狮子造型。', entry:'原展期为 9 月 25 日至 11 月 23 日，已结束。',
         map:'北京朝阳合生汇', sources:[['品牌公告','https://www.sina.cn/news/detail/5343064169907523.html'],['现场与造型','https://news.bjd.com.cn/2026/09/25/11973787.shtml']] },
       { id:'shanghai-store', city:'上海', kind:'open', short:'旗舰店', title:'吉伊卡哇上海旗舰店',
         status:'常设 · 官方旗舰店', address:'黄浦区南京东路 139 号 · 外滩中央广场',
@@ -137,10 +139,14 @@
         status:'常设 · 官方旗舰店', address:'海棠区海棠北路 118 号 · cdf 三亚国际免税城一期 B 区 3 层',
         feature:'逛店｜三亚限定区有木屋棚架和贝壳布景，小八有「海岸拾趣」泳装造型。', entry:'品牌公布 10:00–22:00，常规进店无需预约，周边以门店库存为准。',
         map:'cdf三亚国际免税城一期', sources:[['品牌门店地址及营业时间','https://www.sina.cn/news/detail/5345193316058501.html'],['品牌进店公告','https://www.sina.cn/news/detail/5343471889285330.html'],['门店布景','https://www.sohu.com/a/1078600161_387266']] },
-      { id:'shanghai-clinic', city:'上海', kind:'soon', short:'诊所快闪', title:'吉伊卡哇诊所快闪 · 上海站',
-        status:'即将开始 · 2026.11.27—2027.01.07', address:'黄浦区南京东路 340 号 · 百联 ZX 创趣场 L1 中庭',
-        feature:'找小八｜护士帽夹在蓝耳朵中间，手里托着一颗心形。官方已公布毛绒挂件图，现场布景待开幕核对。', entry:'官宣时段 10:00–22:00。11 月 27—28 日需预约，11 月 29 日至 2027 年 1 月 7 日无需预约。11 月 22 日 10:00 起在微信「阿里鱼IP俱乐部」预约。预约成功后，携预约码和本人有效身份证件，提前 10 分钟到指定排队区。',
-        map:'上海百联ZX创趣场', sources:[['商场预约公告（11 月 20 日）','https://www.sina.cn/news/detail/5367268604117609.html'],['官方上海站','https://chiikawa-info.jp/p26/chiikawaclinic/shanghai.html'],['官方会场图',clinicVenues]] },
+      { id:'shanghai-clinic', city:'上海', kind:'open', short:'诊所快闪', title:'吉伊卡哇诊所快闪 · 上海站',
+        status:'官宣展期 · 2026.11.27—2027.01.07', address:'黄浦区南京东路 340 号 · 百联 ZX 创趣场 L1 中庭',
+        feature:'找小八｜官方毛绒挂件图里，护士帽夹在蓝耳朵中间，手里托着一颗心形。现场布景尚未核实。', entry:'官宣时段 10:00–22:00。11 月 27—28 日需预约，11 月 29 日至 2027 年 1 月 7 日无需预约。预约入口为微信「阿里鱼IP俱乐部」，11 月 22 日 10:00 开放预约。预约成功后，携预约码和本人有效身份证件，提前 10 分钟到指定排队区。是否仍有预约名额以小程序为准。',
+        admission:[
+          {start:'2026-11-27',end:'2026-11-28',text:'当前日期适用预约入场：11 月 27—28 日需预约。请先核对预约码与本人有效身份证件，提前 10 分钟到指定排队区。'},
+          {start:'2026-11-29',end:'2027-01-07',text:'当前日期适用无需预约入场：按商场公告，11 月 29 日至 2027 年 1 月 7 日无需预约，营业时段 10:00–22:00。'}
+        ],
+        map:'上海百联ZX创趣场', sources:[['商场预约公告（11 月 20 日）','https://www.sina.cn/news/detail/5367268604117609.html'],['授权方活动排期',alifish],['官方上海站','https://chiikawa-info.jp/p26/chiikawaclinic/shanghai.html'],['官方会场图',clinicVenues]] },
       { id:'shenzhen-clinic', city:'深圳', kind:'soon', short:'诊所快闪', title:'吉伊卡哇诊所快闪 · 深圳站',
         status:'即将开始 · 2026.12.24—2027.01.25', address:'福田区福华三路 268–269 号 · 星河 COCO Park L1（TG L1 02）',
         feature:'找小八｜官方系列有护士帽小八。现场布景以会场开幕公告为准。', entry:'官宣时段 10:00–22:00，入场安排关注会场后续公告。',
@@ -192,6 +198,10 @@
       return today > dates[1] ? 'ended' : 'open';
     }
 
+    function admissionFor(place) {
+      return place.admission?.find(period => today >= period.start && today <= period.end)?.text || '';
+    }
+
     const byCategory = Object.fromEntries(Object.keys(statuses).map(kind =>
       [kind, places.filter(place => activityStatus(place) === kind)]));
     const hashId = new URLSearchParams(location.hash.slice(1)).get('place');
@@ -224,6 +234,9 @@
       byId('place-title').textContent = place.title;
       byId('place-address').textContent = place.address;
       byId('place-feature').textContent = place.feature;
+      const admission = admissionFor(place);
+      byId('place-admission').textContent = admission;
+      byId('place-admission').hidden = !admission;
       byId('place-entry').textContent = category === 'ended' ? '展期已过。' : place.entry;
       const links = place.sources.map(([label,url]) => link(label,url));
       if (category !== 'ended' && place.map) {
